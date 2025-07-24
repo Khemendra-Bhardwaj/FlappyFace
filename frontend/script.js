@@ -9,12 +9,12 @@
         FPS: 60,
         CANVAS_WIDTH: 800,
         CANVAS_HEIGHT: 600,
-        GRAVITY: 0.5,
-        FLAP_POWER: -8,
+        GRAVITY: 0.35,  // Reduced from 0.5
+        FLAP_POWER: -7,  // Reduced from -8
         PIPE_WIDTH: 80,
-        PIPE_GAP: 150,
-        PIPE_SPEED: 2,
-        PIPE_SPACING: 300,
+        PIPE_GAP: 200,  // Increased gap for easier passage
+        PIPE_SPEED: 0.8,  // Much slower pipes only
+        PIPE_SPACING: 350,  // Increased from 300
         BIRD_SIZE: 30,
         BIRD_X: 150
     };
@@ -28,7 +28,7 @@
         sessionId: null,
         gameStartTime: null,
         lastEmotionCheck: 0,
-        emotionCheckInterval: 2000,
+        emotionCheckInterval: 3500,
         currentEmotion: null,
         difficultyLevel: 1.0,
         maxDifficulty: 1.0,
@@ -384,25 +384,25 @@
         
         if (emotion === 'angry' || emotion === 'fear') {
             // Make game easier for frustrated or stressed players
-            gameState.currentGravity = GAME_CONFIG.GRAVITY * 0.8;
-            gameState.currentFlapPower = GAME_CONFIG.FLAP_POWER * 1.2;
-            gameState.currentPipeGap = GAME_CONFIG.PIPE_GAP * 1.3;
-            gameState.currentPipeSpeed = GAME_CONFIG.PIPE_SPEED * 0.8;
-            gameState.currentPipeSpacing = GAME_CONFIG.PIPE_SPACING * 1.2;
+            gameState.currentGravity = GAME_CONFIG.GRAVITY * 0.85;  // Less extreme
+            gameState.currentFlapPower = GAME_CONFIG.FLAP_POWER * 1.1;  // Less extreme
+            gameState.currentPipeGap = GAME_CONFIG.PIPE_GAP * 1.2;  // Less extreme
+            gameState.currentPipeSpeed = GAME_CONFIG.PIPE_SPEED * 0.85;  // Less extreme
+            gameState.currentPipeSpacing = GAME_CONFIG.PIPE_SPACING * 1.1;  // Less extreme
         } else if (emotion === 'sad') {
             // Make game easier for sad players
             gameState.currentGravity = GAME_CONFIG.GRAVITY * 0.9;
-            gameState.currentFlapPower = GAME_CONFIG.FLAP_POWER * 1.1;
-            gameState.currentPipeGap = GAME_CONFIG.PIPE_GAP * 1.2;
+            gameState.currentFlapPower = GAME_CONFIG.FLAP_POWER * 1.05;  // Less extreme
+            gameState.currentPipeGap = GAME_CONFIG.PIPE_GAP * 1.1;  // Less extreme
             gameState.currentPipeSpeed = GAME_CONFIG.PIPE_SPEED * 0.9;
-            gameState.currentPipeSpacing = GAME_CONFIG.PIPE_SPACING * 1.1;
+            gameState.currentPipeSpacing = GAME_CONFIG.PIPE_SPACING * 1.05;  // Less extreme
         } else if (emotion === 'happy') {
             // Make game slightly harder for engaged players
-            gameState.currentGravity = GAME_CONFIG.GRAVITY * 1.1;
-            gameState.currentFlapPower = GAME_CONFIG.FLAP_POWER * 0.9;
-            gameState.currentPipeGap = GAME_CONFIG.PIPE_GAP * 0.9;
-            gameState.currentPipeSpeed = GAME_CONFIG.PIPE_SPEED * 1.1;
-            gameState.currentPipeSpacing = GAME_CONFIG.PIPE_SPACING * 0.9;
+            gameState.currentGravity = GAME_CONFIG.GRAVITY * 1.05;  // Less extreme
+            gameState.currentFlapPower = GAME_CONFIG.FLAP_POWER * 0.95;  // Less extreme
+            gameState.currentPipeGap = GAME_CONFIG.PIPE_GAP * 0.95;  // Less extreme
+            gameState.currentPipeSpeed = GAME_CONFIG.PIPE_SPEED * 1.05;  // Less extreme
+            gameState.currentPipeSpacing = GAME_CONFIG.PIPE_SPACING * 0.95;  // Less extreme
         } else {
             // Default parameters
             gameState.currentGravity = GAME_CONFIG.GRAVITY;
@@ -774,7 +774,7 @@
             sessionId: null,
             gameStartTime: null,
             lastEmotionCheck: 0,
-            emotionCheckInterval: 2000,
+            emotionCheckInterval: 3500,
             currentEmotion: null,
             difficultyLevel: 1.0,
             maxDifficulty: 1.0,

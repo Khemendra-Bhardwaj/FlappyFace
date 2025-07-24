@@ -34,16 +34,15 @@ def load_model():
     global model, model_loaded
     
     try:
-        # Look for the trained model
-        model_path = os.path.join(os.path.dirname(__file__), 'models', 'emotion_model.h5')
+        # Look for the face_model.h5 (new trained model)
+        model_path = os.path.join(os.path.dirname(__file__), 'models', 'face_model.h5')
         
         if not os.path.exists(model_path):
             logger.error(f"Model file not found at {model_path}")
-            logger.error("Please download a pre-trained model from Kaggle and place it at: backend/ml-service/models/emotion_model.h5")
-            logger.error("Recommended: Search for 'FER2013 emotion recognition' on Kaggle")
+            logger.error("Please ensure face_model.h5 is in backend/ml-service/models/")
             return False
         
-        logger.info(f"Loading trained model from {model_path}")
+        logger.info(f"Loading face_model.h5 from {model_path}")
         
         # Load the model
         model = keras.models.load_model(model_path, compile=False)
@@ -56,7 +55,7 @@ def load_model():
         )
         
         model_loaded = True
-        logger.info("Trained emotion model loaded successfully!")
+        logger.info("face_model.h5 loaded successfully!")
         
         # Test the model with a dummy prediction
         test_input = np.random.rand(1, 48, 48, 1).astype('float32')
@@ -121,6 +120,12 @@ def predict_emotion(image_array):
         
         # Make prediction
         predictions = model.predict(image_array, verbose=0)
+        
+        # Debug: Log all emotion predictions
+        logger.info("All emotion predictions:")
+        for i, (emotion, prob) in enumerate(zip(emotion_labels, predictions[0])):
+            logger.info(f"  {emotion}: {prob:.4f}")
+        
         emotion_index = np.argmax(predictions[0])
         confidence = float(predictions[0][emotion_index])
         
@@ -211,6 +216,71 @@ def test_endpoint():
         
     except Exception as e:
         logger.error(f"Error in test endpoint: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/test_different_emotions', methods=['GET'])
+def test_different_emotions():
+    """Test endpoint that creates different types of images to test model bias"""
+    try:
+        results = []
+        
+        # Test 1: Random noise
+        dummy_image = np.random.rand(48, 48) * 255
+        dummy_image = dummy_image.astype(np.uint8)
+        pil_image = Image.fromarray(dummy_image)
+        buffer = io.BytesIO()
+        pil_image.save(buffer, format='JPEG')
+        image_base64 = base64.b64encode(buffer.getvalue()).decode()
+        image_array = preprocess_image(f"data:image/jpeg;base64,{image_base64}")
+        emotion, confidence = predict_emotion(image_array)
+        results.append({
+            'test_type': 'random_noise',
+            'emotion': emotion,
+            'confidence': confidence
+        })
+        
+        # Test 2: Bright image (should be happy-like)
+        bright_image = np.ones((48, 48)) * 200
+        bright_image = bright_image.astype(np.uint8)
+        pil_image = Image.fromarray(bright_image)
+        buffer = io.BytesIO()
+        pil_image.save(buffer, format='JPEG')
+        image_base64 = base64.b64encode(buffer.getvalue()).decode()
+        image_array = preprocess_image(f"data:image/jpeg;base64,{image_base64}")
+        emotion, confidence = predict_emotion(image_array)
+        results.append({
+            'test_type': 'bright_image',
+            'emotion': emotion,
+            'confidence': confidence
+        })
+        
+        # Test 3: Dark image (should be sad-like)
+        dark_image = np.ones((48, 48)) * 50
+        dark_image = dark_image.astype(np.uint8)
+        pil_image = Image.fromarray(dark_image)
+        buffer = io.BytesIO()
+        pil_image.save(buffer, format='JPEG')
+        image_base64 = base64.b64encode(buffer.getvalue()).decode()
+        image_array = preprocess_image(f"data:image/jpeg;base64,{image_base64}")
+        emotion, confidence = predict_emotion(image_array)
+        results.append({
+            'test_type': 'dark_image',
+            'emotion': emotion,
+            'confidence': confidence
+        })
+        
+        return jsonify({
+            'success': True,
+            'message': 'Different emotion tests completed',
+            'results': results,
+            'timestamp': time.time()
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in test_different_emotions endpoint: {str(e)}")
         return jsonify({
             'success': False,
             'error': str(e)
