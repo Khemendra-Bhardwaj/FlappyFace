@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Flappy Bird Emotion Game</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Game Header -->
+        <div class="game-header">
+            <h1>🐦 Flappy Bird Emotion Game</h1>
+            <div class="game-info">
+                <div class="score-container">
+                    <span>Score: </span>
+                    <span id="score">0</span>
+                </div>
+                <div class="difficulty-container">
+                    <span>Difficulty: </span>
+                    <span id="difficulty">1.0</span>
+                </div>
+                <div class="emotion-container">
+                    <span>Emotion: </span>
+                    <span id="emotion">None</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Camera Feed -->
+        <div class="camera-section">
+            <video id="video" width="320" height="240" autoplay muted></video>
+            <canvas id="canvas" width="320" height="240" style="display: none;"></canvas>
+            <div class="camera-controls">
+                <button id="startCamera">Start Camera</button>
+                <button id="stopCamera">Stop Camera</button>
+            </div>
+        </div>
+
+        <!-- Game Canvas -->
+        <div class="game-section">
+            <canvas id="gameCanvas" width="800" height="600"></canvas>
+        </div>
+
+        <!-- Game Controls -->
+        <div class="controls">
+            <div class="control-info">
+                <p><strong>Controls:</strong></p>
+                <p>SPACE - Flap / Start Game</p>
+                <p>ESC - Pause</p>
+                <p>R - Restart</p>
+            </div>
+            <div class="emotion-info">
+                <p><strong>Emotion Detection (Optional):</strong></p>
+                <p>The game adjusts difficulty based on your emotions!</p>
+                <p>😤 Frustration = Easier | 😴 Boredom = Harder | 😰 Stress = Easier</p>
+                <p><small>Game works perfectly without camera access</small></p>
+            </div>
+        </div>
+
+        <!-- Game Stats -->
+        <div class="stats-section" id="statsSection" style="display: none;">
+            <h3>Game Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-label">Final Score:</span>
+                    <span class="stat-value" id="finalScore">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Max Difficulty:</span>
+                    <span class="stat-value" id="maxDifficulty">1.0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Emotions Detected:</span>
+                    <span class="stat-value" id="emotionsDetected">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Game Duration:</span>
+                    <span class="stat-value" id="gameDuration">0s</span>
+                </div>
+            </div>
+            <button id="playAgain">Play Again</button>
+        </div>
+    </div>
+
+    <script src="script.js?v=1.0"></script>
+</body>
+</html> 

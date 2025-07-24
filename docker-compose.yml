@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - flappy-bird-network
+
+  backend:
+    build: ./backend
+    ports:
+      - "5002:5002"
+    environment:
+      - PORT=5002
+    depends_on:
+      - ml-service
+    networks:
+      - flappy-bird-network
+
+  ml-service:
+    build: ./backend/ml-service
+    ports:
+      - "5003:5003"
+    environment:
+      - PORT=5003
+    volumes:
+      - ./backend/ml-service/models:/app/models
+    networks:
+      - flappy-bird-network
+
+networks:
+  flappy-bird-network:
+    driver: bridge 
