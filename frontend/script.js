@@ -63,6 +63,7 @@
     const scoreDisplay = document.getElementById('score');
     const difficultyDisplay = document.getElementById('difficulty');
     const statsSection = document.getElementById('statsSection');
+    const modelStatusDisplay = document.getElementById('modelStatus');
 
     // Backend API Configuration
     const BACKEND_URL = '/api';  // Use relative path for backend (proxied by nginx)
@@ -87,6 +88,9 @@
         if (stopCameraBtn) stopCameraBtn.addEventListener('click', stopCamera);
         if (playAgainBtn) playAgainBtn.addEventListener('click', resetGame);
         
+        // Check model status
+        checkModelStatus();
+        
         // Start camera by default
         startCamera();
         
@@ -94,6 +98,30 @@
         gameLoop = requestAnimationFrame(updateGame);
         
         console.log('Flappy Bird Emotion Game initialized successfully');
+    }
+
+    // Model status check
+    async function checkModelStatus() {
+        try {
+            const response = await fetch(`${ML_SERVICE_URL}/health`);
+            if (response.ok) {
+                const data = await response.json();
+                if (data.model_loaded) {
+                    modelStatusDisplay.textContent = '✅ Loaded';
+                    modelStatusDisplay.className = 'loaded';
+                } else {
+                    modelStatusDisplay.textContent = '❌ Not Loaded';
+                    modelStatusDisplay.className = 'not-loaded';
+                }
+            } else {
+                modelStatusDisplay.textContent = '❌ Error';
+                modelStatusDisplay.className = 'error';
+            }
+        } catch (error) {
+            modelStatusDisplay.textContent = '❌ Offline';
+            modelStatusDisplay.className = 'offline';
+            console.error('Model status check error:', error);
+        }
     }
 
     // Camera functions
@@ -141,7 +169,7 @@
     }
 
     async function captureAndAnalyzeEmotion() {
-        if (!gameState.isRunning || !video.srcObject) return;
+        if (!video.srcObject) return;
         
         try {
             const canvas = document.getElementById('canvas');
@@ -150,7 +178,10 @@
             
             const imageData = canvas.toDataURL('image/jpeg', 0.8);
             
-            console.log('Sending emotion request to:', `${ML_SERVICE_URL}/predict_emotion`);
+            console.log('📸 CAPTURING IMAGE:', new Date().toISOString());
+            console.log('📤 Sending emotion request to:', `${ML_SERVICE_URL}/predict_emotion`);
+            console.log('🖼️ Image size:', imageData.length, 'characters');
+            console.log('📊 Canvas dimensions:', canvas.width, 'x', canvas.height);
             
             const response = await fetch(`${ML_SERVICE_URL}/predict_emotion`, {
                 method: 'POST',
@@ -162,18 +193,31 @@
             
             if (response.ok) {
                 const result = await response.json();
+                console.log('🤖 ML Service Response:', result);
                 if (result.success) {
+                    console.log(`🎭 Processing emotion: ${result.emotion} with confidence: ${result.confidence}`);
                     updateEmotion(result.emotion, result.confidence);
+                } else {
+                    console.log('❌ ML Service returned success: false');
                 }
+            } else {
+                console.log('❌ ML Service response not ok:', response.status);
             }
         } catch (error) {
             console.log('Emotion detection not available - game will run with normal difficulty');
             console.error('Emotion detection error:', error);
+            
+            // Show error in emotion display
+            emotionDisplay.textContent = 'Detection Error';
+            emotionDisplay.className = 'error';
         }
     }
 
     function updateEmotion(emotion, confidence) {
-        if (confidence > 0.5) {
+        console.log(`updateEmotion called with: ${emotion}, confidence: ${confidence}`);
+        
+        // Accept emotions with lower confidence for better responsiveness
+        if (confidence > 0.1) {
             gameState.currentEmotion = emotion;
             gameState.emotionsDetected++;
             
@@ -188,6 +232,14 @@
             showEmotionNotification(emotion, confidence);
             
             console.log(`Emotion detected: ${emotion} (confidence: ${confidence.toFixed(2)})`);
+        } else {
+            // Show low confidence emotion but don't update game state
+            emotionDisplay.textContent = `${emotion} (${(confidence * 100).toFixed(1)}%) - Low`;
+            emotionDisplay.className = 'low-confidence';
+            console.log(`Low confidence emotion: ${emotion} (confidence: ${confidence.toFixed(2)})`);
+            
+            // Still update difficulty for low confidence emotions
+            updateDifficulty();
         }
     }
 
@@ -245,7 +297,7 @@
     }
 
     function startGameSession() {
-        fetch(`${BACKEND_URL}/api/game/start`, {
+        fetch(`${BACKEND_URL}/game/start`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -483,7 +535,7 @@
     function sendGameState() {
         if (!gameState.sessionId) return;
         
-        fetch(`${BACKEND_URL}/api/game/update`, {
+        fetch(`${BACKEND_URL}/game/update`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -685,7 +737,7 @@
     function endGameSession() {
         if (!gameState.sessionId) return;
         
-        fetch(`${BACKEND_URL}/api/game/end`, {
+        fetch(`${BACKEND_URL}/game/end`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

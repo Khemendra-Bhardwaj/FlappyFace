@@ -34,43 +34,42 @@ def load_model():
     global model, model_loaded
     
     try:
+        # Look for the trained model
         model_path = os.path.join(os.path.dirname(__file__), 'models', 'emotion_model.h5')
         
         if not os.path.exists(model_path):
-            logger.warning(f"Model file not found at {model_path}")
-            logger.info("Please place your trained model at: backend/ml-service/models/emotion_model.h5")
-            logger.info("Creating a dummy model for testing purposes")
-            model = create_dummy_model()
-            model_loaded = True
-            return
+            logger.error(f"Model file not found at {model_path}")
+            logger.error("Please download a pre-trained model from Kaggle and place it at: backend/ml-service/models/emotion_model.h5")
+            logger.error("Recommended: Search for 'FER2013 emotion recognition' on Kaggle")
+            return False
         
-        logger.info(f"Loading your trained model from {model_path}")
-        model = keras.models.load_model(model_path)
+        logger.info(f"Loading trained model from {model_path}")
+        
+        # Load the model
+        model = keras.models.load_model(model_path, compile=False)
+        
+        # Compile the model
+        model.compile(
+            optimizer='adam',
+            loss='categorical_crossentropy',
+            metrics=['accuracy']
+        )
+        
         model_loaded = True
-        logger.info("Your trained emotion model loaded successfully!")
+        logger.info("Trained emotion model loaded successfully!")
         
         # Test the model with a dummy prediction
         test_input = np.random.rand(1, 48, 48, 1).astype('float32')
         test_prediction = model.predict(test_input, verbose=0)
         logger.info(f"Model test successful. Output shape: {test_prediction.shape}")
         
+        return True
+        
     except Exception as e:
-        logger.error(f"Error loading your model: {str(e)}")
-        logger.info("Creating a dummy model for testing purposes")
-        model = create_dummy_model()
-        model_loaded = True
+        logger.error(f"Error loading model: {str(e)}")
+        return False
 
-def create_dummy_model():
-    """Create a dummy model for testing when the real model is not available"""
-    model = keras.Sequential([
-        keras.layers.Input(shape=(48, 48, 1)),
-        keras.layers.Conv2D(32, (3, 3), activation='relu'),
-        keras.layers.MaxPooling2D((2, 2)),
-        keras.layers.Flatten(),
-        keras.layers.Dense(7, activation='softmax')
-    ])
-    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-    return model
+
 
 def preprocess_image(image_data):
     """
@@ -159,6 +158,11 @@ def predict_emotion_endpoint():
         
         # Preprocess image
         image_array = preprocess_image(image_data)
+        
+        # Debug: Log image array info
+        logger.info(f"Image array shape: {image_array.shape}")
+        logger.info(f"Image array min/max: {np.min(image_array):.3f}/{np.max(image_array):.3f}")
+        logger.info(f"Image array mean: {np.mean(image_array):.3f}")
         
         # Predict emotion
         emotion, confidence = predict_emotion(image_array)
@@ -254,14 +258,19 @@ def get_emotions():
 # Load model on startup
 def initialize():
     """Initialize the model before first request"""
-    load_model()
+    success = load_model()
+    if not success:
+        logger.error("Failed to load model. Service may not work properly.")
 
 # Initialize model when module loads
 initialize()
 
 if __name__ == '__main__':
     # Load model immediately
-    load_model()
+    success = load_model()
+    if not success:
+        logger.error("Failed to load model. Exiting.")
+        exit(1)
     
     # Get port from environment variable or use default
     port = int(os.environ.get('PORT', 5003))

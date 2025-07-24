@@ -216,6 +216,43 @@ body {
 #emotion.surprise { background-color: #f1c40f; color: #2c3e50; }
 #emotion.disgust { background-color: #27ae60; color: white; }
 #emotion.neutral { background-color: #95a5a6; color: white; }
+#emotion.low-confidence { background-color: #fff3cd; color: #856404; }
+#emotion.error { background-color: #f8d7da; color: #721c24; }
+
+/* Model status styles */
+.model-status {
+    display: inline-block;
+    margin-left: 20px;
+    font-size: 0.9em;
+}
+
+#modelStatus {
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 3px;
+    background-color: #f8f9fa;
+    color: #6c757d;
+}
+
+#modelStatus.loaded {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+#modelStatus.not-loaded {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+#modelStatus.error {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+#modelStatus.offline {
+    background-color: #e2e3e5;
+    color: #383d41;
+}
 
 /* Responsive Design */
 @media (max-width: 768px) {
