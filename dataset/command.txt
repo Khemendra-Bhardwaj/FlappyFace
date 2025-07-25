@@ -1,0 +1,3 @@
+Command to download fer 2013 dataset on local: 
+
+wget https://www.dropbox.com/s/opuvvdv3ulibyp6/fer2013.tar.gz
