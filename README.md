@@ -211,15 +211,6 @@ curl -X GET http://localhost:3000/ml/test
 - **Accuracy**: 65% on FER2013 test set
 - **Concurrent Users**: Supports 10+ simultaneous players
 
-### System Performance
-- **Startup Time**: <30 seconds for all services
-- **Response Time**: <100ms for API calls
-- **Memory Footprint**: ~500MB total system memory
-
-### Game Performance
-- **Frame Rate**: 60 FPS
-- **Input Lag**: <16ms
-- **Difficulty Response**: <2 seconds to emotion changes
 
 ## 🔬 Technical Highlights
 
@@ -256,22 +247,7 @@ curl -X GET http://localhost:3000/ml/test
 - **Multi-modal emotion detection** (voice, gestures)
 - **Affective computing** integration for broader applications
 
-## 📄 License & Acknowledgments
 
-### License
-This project is licensed under the MIT License.
-
-### Dataset Citation
-```
-@inproceedings{fer2013,
-  title={Challenges in representation learning: A report on three machine learning contests},
-  author={Goodfellow, Ian J and Erhan, Dumitru and Carrier, Pierre Luc and Courville, Aaron and Mirza, Mehdi and Hamner, Benjamin and Cukierski, Will and Tang, Yichuan and Thaler, David and Lee, Dong-Hyun and others},
-  booktitle={International conference on neural information processing},
-  pages={117--124},
-  year={2013},
-  organization={Springer}
-}
-```
 
 ## 🎉 Conclusion
 
